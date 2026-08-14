@@ -132,6 +132,18 @@
   html {
     @apply font-sans;
   }
+  /*
+   * Visible keyboard focus everywhere. shadcn/base-ui components ship their
+   * own focus treatment (data-slot), so this covers custom interactive
+   * elements — option cards, chips, graph nodes, drawer triggers.
+   */
+  :focus-visible:not([data-slot]) {
+    outline: 2px solid color-mix(in oklch, var(--ring) 75%, transparent);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: color-mix(in oklch, var(--primary) 18%, transparent);
+  }
 }
 
 /*
@@ -172,5 +184,8 @@
 @media (prefers-reduced-motion: reduce) {
   .react-flow__node {
     transition: none;
+  }
+  html {
+    scroll-behavior: auto;
   }
 }

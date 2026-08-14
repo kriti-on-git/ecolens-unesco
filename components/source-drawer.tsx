@@ -71,6 +71,7 @@ export function SourceDrawer({ source, topicId, onClose }: SourceDrawerProps) {
                 type="button"
                 onClick={onClose}
                 aria-label="Close"
+                autoFocus
                 className="text-muted-foreground hover:bg-muted hover:text-foreground rounded-md p-1.5 transition-colors"
               >
                 <X className="size-4" />

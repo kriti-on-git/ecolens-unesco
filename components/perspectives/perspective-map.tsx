@@ -32,12 +32,13 @@ interface InfoNodeData {
   summary?: string;
   selected?: boolean;
   opened?: boolean;
+  explored?: boolean;
   dimensionKind?: TopicDimensionKind;
   sourceId?: string;
 }
 
 function InfoNode({ data }: NodeProps) {
-  const { label, tag, kind, selected, opened } = data as unknown as InfoNodeData;
+  const { label, tag, kind, selected, opened, explored } = data as unknown as InfoNodeData;
   const clickable = kind !== 'topic';
   return (
     <div
@@ -57,11 +58,11 @@ function InfoNode({ data }: NodeProps) {
         ) : (
           <span />
         )}
-        {opened && (
+        {(opened || (kind === 'dimension' && explored)) && (
           <span
             className="bg-primary size-1.5 shrink-0 rounded-full"
-            title="Opened"
-            aria-label="Opened"
+            title={kind === 'dimension' ? 'Explored' : 'Opened'}
+            aria-label={kind === 'dimension' ? 'Explored' : 'Opened'}
           />
         )}
       </div>
@@ -113,7 +114,8 @@ export function PerspectiveMap({ topic }: { topic: Topic }) {
 
 function PerspectiveMapInner({ topic }: { topic: Topic }) {
   const graph = useMemo(() => getKnowledgeGraph(topic.id), [topic.id]);
-  const { markDimensionsExplored, openedNodes, markNodeOpened } = useEcholens();
+  const { markDimensionsExplored, openedNodes, markNodeOpened, getExplored } = useEcholens();
+  const explored = getExplored(topic.id);
 
   const [selectedKind, setSelectedKind] = useState<TopicDimensionKind | null>(null);
   const [activeSource, setActiveSource] = useState<Source | null>(null);
@@ -122,8 +124,8 @@ function PerspectiveMapInner({ topic }: { topic: Topic }) {
   const { fitView } = useReactFlow();
 
   const elements = useMemo(
-    () => buildElements(topic, graph, selectedKind, openedNodes),
-    [topic, graph, selectedKind, openedNodes],
+    () => buildElements(topic, graph, selectedKind, openedNodes, explored),
+    [topic, graph, selectedKind, openedNodes, explored],
   );
 
   useEffect(() => {
@@ -228,6 +230,10 @@ function MapLegend({ topic }: { topic: Topic }) {
           </li>
         ))}
       </ul>
+      <p className="text-muted-foreground border-border/60 mt-4 border-t pt-3 text-[11px]">
+        <span className="bg-primary mr-1 inline-block size-1.5 rounded-full" aria-hidden />
+        Dimensions you&apos;ve already explored are marked on the map.
+      </p>
     </div>
   );
 }
@@ -435,6 +441,7 @@ function buildElements(
   graph: ReturnType<typeof getKnowledgeGraph>,
   selectedKind: TopicDimensionKind | null,
   openedNodes: string[],
+  explored: TopicDimensionKind[],
 ): { nodes: Node[]; edges: Edge[] } {
   if (selectedKind) {
     const branch = buildBranch(topic, graph, selectedKind);
@@ -450,6 +457,7 @@ function buildElements(
         tag: 'Dimension',
         kind: 'dimension',
         selected: true,
+        explored: explored.includes(branch.kind),
         dimensionKind: branch.kind,
       },
     });
@@ -566,6 +574,7 @@ function buildElements(
         label: getDimension(d.kind).label,
         tag: getDimension(d.kind).tag,
         kind: 'dimension',
+        explored: explored.includes(d.kind),
         dimensionKind: d.kind,
       },
     });

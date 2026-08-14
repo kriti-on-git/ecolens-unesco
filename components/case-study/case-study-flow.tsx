@@ -88,12 +88,10 @@ export function CaseStudyFlow({ caseStudy, topic }: CaseStudyFlowProps) {
 
   const selectOption = (option: CaseOption) => {
     if (!currentQuestion || selectedOptionId) return;
-    const dims = [
-      ...new Set([
-        ...(currentQuestion.relatedDimensionKinds ?? []),
-        ...(option.dimensionKind ? [option.dimensionKind] : []),
-      ]),
-    ];
+    // Only the chosen option's dimension counts as *explored* — question
+    // framing mentions many dimensions, but the user's lean is what shapes
+    // coverage and gap detection (prompt3: compare dimensions vs explored).
+    const dims = option.dimensionKind ? [option.dimensionKind] : [];
     setResponses((prev) => [
       ...prev,
       {

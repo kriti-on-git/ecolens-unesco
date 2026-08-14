@@ -28,6 +28,7 @@ interface EcholensContextValue {
   lastTopicId: string | null;
   getProfile: (topicId: string) => AwarenessProfile | null;
   getProfiles: () => AwarenessProfile[];
+  getExplored: (topicId: string) => TopicDimensionKind[];
   completeCaseStudy: (
     topic: Topic,
     caseStudy: CaseStudy,
@@ -82,7 +83,13 @@ function subscribe(onStoreChange: () => void): () => void {
 }
 
 function update(fn: (prev: EcholensState) => EcholensState): void {
-  store = fn(store);
+  // Always start from the persisted store: effects can fire before React's
+  // post-hydration store check has loaded localStorage, and writing from the
+  // empty module default would wipe saved progress (prompt4 bugfix).
+  const current = getSnapshot();
+  const next = fn(current);
+  if (next === current) return; // no change — avoid writes and re-renders
+  store = next;
   saveJson(STORAGE_KEYS.state, store);
   listeners.forEach((listener) => listener());
 }
@@ -95,6 +102,7 @@ export function EcholensProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo<EcholensContextValue>(() => {
     const getProfile = (topicId: string) => state.profiles[topicId] ?? null;
+    const getExplored = (topicId: string) => state.explored[topicId] ?? [];
     const getProfiles = () =>
       Object.values(state.profiles).sort(
         (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
@@ -183,6 +191,7 @@ export function EcholensProvider({ children }: { children: React.ReactNode }) {
       lastTopicId: state.lastTopicId,
       getProfile,
       getProfiles,
+      getExplored,
       completeCaseStudy,
       markDimensionsExplored,
       markSourceOpened,

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowUpRight, MessageSquare, Search, X } from 'lucide-react';
+import { MessageSquare, Search, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { Topic, TopicCategory, TopicTimeGroup } from '@/types';
@@ -24,6 +24,10 @@ export function TopicExplorer({ topics, categories }: TopicExplorerProps) {
   const [timeGroup, setTimeGroup] = useState<'all' | TopicTimeGroup>('all');
   const [categoryId, setCategoryId] = useState<'all' | string>('all');
   const [query, setQuery] = useState('');
+  const categoryLabelById = useMemo(
+    () => new Map(categories.map((c) => [c.id, c.label])),
+    [categories],
+  );
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -138,15 +142,12 @@ export function TopicExplorer({ topics, categories }: TopicExplorerProps) {
                   {topic.subtitle}
                 </p>
               </div>
-              <div className="text-muted-foreground mt-auto flex items-center justify-between pt-1 text-xs">
-                <span className="inline-flex items-center gap-1.5">
+              <div className="text-muted-foreground mt-auto flex items-center justify-between gap-2 pt-1 text-xs">
+                <span className="truncate">{categoryLabelById.get(topic.categoryId)}</span>
+                <span className="inline-flex shrink-0 items-center gap-1.5">
                   <MessageSquare className="size-3.5" aria-hidden />
-                  {topic.discussionCount.toLocaleString()} discussions
+                  {topic.discussionCount.toLocaleString()}
                 </span>
-                <ArrowUpRight
-                  className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                  aria-hidden
-                />
               </div>
             </Link>
           </motion.li>
