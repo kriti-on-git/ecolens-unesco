@@ -20,7 +20,7 @@ import { ChevronDown, Eye, RotateCcw } from 'lucide-react';
 import { useEcholens } from '@/components/echolens-provider';
 import { SourceDrawer } from '@/components/source-drawer';
 import { getDimension } from '@/data/perspectives';
-import { getKnowledgeGraph, getSourcesByIds, sources } from '@/data';
+import { getKnowledgeGraph, getRecommendationsForTopic, getSourcesByIds, sources } from '@/data';
 import { sourceTypeIcon, sourceTypeLabel } from '@/lib/source-meta';
 import { cn } from '@/lib/utils';
 import type { Source, Topic, TopicDimensionKind } from '@/types';
@@ -615,7 +615,16 @@ function buildBranch(
 
   const graphSourceIds = [...graphClaims, ...graphEvidence].flatMap((n) => n.sourceIds);
   const graphSources = getSourcesByIds(graphSourceIds);
-  const fallbackSources = sources.filter((s) => s.dimensionKinds.includes(kind));
+  // Fall back only to sources that belong to this topic (its graph or its
+  // recommendations) — a global dimension filter would leak other topics'
+  // sources into this branch (prompt4 visual QA fix).
+  const topicSourceIds = new Set<string>([
+    ...graphSourceIds,
+    ...getRecommendationsForTopic(topic.id).map((r) => r.source.id),
+  ]);
+  const fallbackSources = sources.filter(
+    (s) => s.dimensionKinds.includes(kind) && topicSourceIds.has(s.id),
+  );
   const sourceSet = new Map<string, Source>();
   [...graphSources, ...fallbackSources].forEach((s) => sourceSet.set(s.id, s));
 
