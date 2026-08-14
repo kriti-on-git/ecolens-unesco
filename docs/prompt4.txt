@@ -1,0 +1,149 @@
+now complete and stabilise the entire echolens prototype.
+
+do not redesign the architecture.
+
+do not introduce new infrastructure unless absolutely necessary.
+
+perform a complete end-to-end audit.
+
+verify the full journey
+
+test:
+
+home
+→ trending topics
+→ category/time filtering
+→ topic
+→ case study
+→ branching answers
+→ awareness profile
+→ unexplored dimensions
+→ perspective branch
+→ claim
+→ evidence
+→ source
+→ recommendation
+→ profile
+→ return to case study
+→ new questions
+→ updated profile
+fix
+broken navigation
+state loss
+incorrect scoring
+branch rendering
+animation glitches
+loading states
+API failures
+empty states
+responsive issues
+TypeScript errors
+hydration issues
+console errors
+polish
+
+improve:
+
+typography
+whitespace
+visual hierarchy
+interaction feedback
+node animations
+transitions
+profile visualization
+recommendation cards
+information labels
+topic discovery
+
+the interface should feel like a real product rather than a hackathon dashboard.
+
+demo reliability
+
+add a reliable demo mode.
+
+the demo must continue working if:
+
+LLM API fails
+network is unavailable
+a recommendation cannot load
+optional content is unavailable
+
+use deterministic local fallback data.
+
+performance
+
+avoid:
+
+unnecessary rerenders
+giant client components
+unnecessary dependencies
+excessive animations
+huge bundled datasets
+
+use server components where appropriate.
+
+accessibility
+
+ensure:
+
+keyboard navigation
+visible focus
+semantic controls
+readable contrast
+reduced-motion support
+meaningful labels
+final verification
+
+run:
+
+npm run lint
+npm run build
+
+fix every error.
+
+then manually test the complete user journey.
+
+do not stop at "the pages render."
+
+the final standard is:
+
+a user should be able to enter echolens, explore a topic, have their current information perspective mapped, discover missing dimensions, explore those dimensions through dynamic branches, consume recommended information, return to the case study, and see their awareness profile evolve.
+
+that complete loop is the definition of success.
+
+final instruction to the coding agent:
+
+this project is intentionally a high-quality vertical slice.
+
+do not confuse prototype limitations with architectural weakness.
+
+hardcoded data is acceptable.
+
+deterministic branching is acceptable.
+
+curated recommendations are acceptable.
+
+mock trend signals are acceptable.
+
+what is not acceptable is:
+
+broken UX
+fake interactions
+random scores
+meaningless AI output
+unnecessary infrastructure
+architecture drift
+generic UI
+unfinished flows
+
+build the smallest system capable of delivering the complete echolens experience.
+
+preserve the architecture.
+
+prioritize the product loop.
+
+make the information landscape beautiful.
+
+make the user feel that they discovered something they did not know they were missing.
+
+echolens — see beyond your feed.

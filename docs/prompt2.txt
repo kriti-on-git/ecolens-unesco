@@ -1,0 +1,144 @@
+implement the complete echolens frontend experience.
+
+follow project_base.md exactly.
+
+build these experiences:
+
+home
+ ↓
+topic discovery
+ ↓
+topic detail
+ ↓
+case study
+ ↓
+awareness profile
+ ↓
+perspective map
+ ↓
+dynamic information branches
+ ↓
+source/content exploration
+ ↓
+recommendations
+ ↓
+profile update
+ ↓
+case study again
+home
+
+show:
+
+echolens branding
+tagline
+current/trending topics
+categories
+time grouping
+search/select topic
+clean information-centric layout
+topic page
+
+show:
+
+topic
+context
+dimensions
+information landscape
+start case study
+case study
+
+build:
+
+adaptive question interface
+branching question transitions
+progress indicator
+answer selection
+contextual explanation
+smooth animations
+
+do not use generic quiz aesthetics.
+
+awareness profile
+
+build:
+
+overall awareness score
+perspective coverage
+evidence awareness
+source diversity
+context awareness
+topic depth
+explored dimensions
+unexplored dimensions
+
+use charts only where they improve comprehension.
+
+perspective map
+
+build the central topic and surrounding dimensions.
+
+clicking an unexplored dimension must animate into a deeper information branch.
+
+information branches
+
+use React Flow and/or Framer Motion.
+
+branches must support:
+
+dimension
+ ↓
+claims
+ ↓
+evidence
+ ↓
+context
+ ↓
+sources
+ ↓
+content
+
+make branch expansion visually impressive but restrained.
+
+recommendations
+
+build:
+
+recommendation cards
+source type
+source metadata
+recommendation reason
+category
+dimension
+open/explore interaction
+global profile
+
+allow the user to access their awareness profile throughout the experience.
+
+design rules
+
+keep the design:
+
+minimal
+fresh
+rich
+premium
+calm
+
+avoid:
+
+visual clutter
+excessive gradients
+excessive glassmorphism
+generic AI visuals
+excessive rounded cards
+neon colors
+
+use Framer Motion intentionally.
+
+respect reduced motion.
+
+make the desktop experience exceptional.
+
+make smaller screens usable.
+
+do not change the architecture from project_base.md.

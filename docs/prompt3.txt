@@ -1,0 +1,158 @@
+implement the functional intelligence layer for echolens.
+
+do not introduce a database or complex backend architecture.
+
+use:
+
+typed local data
+localStorage
+Next.js server functionality
+isolated AI service functions
+implement topic data
+
+create curated topics across categories such as:
+
+politics & public policy
+technology
+science
+literature & culture
+society
+economics
+environment
+history
+law
+education
+
+include:
+
+current/trending labels
+time grouping
+topic descriptions
+dimensions
+implement case studies
+
+create polished adaptive case studies for at least 3 topics.
+
+each case study must have branching paths.
+
+questions should explore:
+
+assumptions
+evidence
+interpretation
+causes
+consequences
+stakeholders
+context
+uncertainty
+
+different answers must lead to different question paths.
+
+implement scoring
+
+create deterministic scoring logic.
+
+calculate:
+
+information awareness
+perspective coverage
+evidence awareness
+source diversity
+context awareness
+topic depth
+
+scores must be explainable.
+
+do not use an LLM to randomly generate scores.
+
+implement gap detection
+
+compare:
+
+topic dimensions
+
+against:
+
+dimensions explored by user
+
+return:
+
+explored dimensions
+missing dimensions
+implement knowledge graph data
+
+create typed graph data.
+
+each topic should connect to:
+
+dimensions
+claims
+evidence
+sources
+related issues
+stakeholders
+context
+
+render through React Flow.
+
+implement recommendation data
+
+create curated recommendations for each major dimension.
+
+recommendations may represent:
+
+articles
+videos
+research
+books
+government documents
+court documents
+expert analysis
+public social content
+
+every recommendation needs:
+
+title
+source
+type
+description
+dimension
+why recommended
+implement AI abstraction
+
+create a centralized AI service.
+
+it should support structured analysis for:
+
+content understanding
+topic interpretation
+claim extraction
+contextual explanation
+recommendation explanation
+
+the AI provider must be replaceable.
+
+never place provider-specific code throughout the frontend.
+
+fallback behavior
+
+if AI is unavailable:
+
+use deterministic mock responses
+keep the application functional
+never display a broken state
+user state
+
+persist:
+
+selected topic
+answers
+explored dimensions
+opened nodes
+viewed recommendations
+profile scores
+case-study iteration
+
+using localStorage or equivalent lightweight client persistence.
+
+do not add Redux unless absolutely necessary.
