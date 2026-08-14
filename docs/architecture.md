@@ -37,6 +37,7 @@ app/                    Next.js App Router pages
   perspectives/[slug]/  Perspective map / dynamic branches
   profile/              Awareness profile
   recommendations/      Recommendations with explanations
+  api/analyze/          Content-understanding endpoint (AI service)
 components/
   ui/                   shadcn/ui primitives (button, card, badge, …)
   site-header.tsx       Persistent navigation
@@ -51,9 +52,9 @@ data/                   Typed mock content (replaces APIs/databases in prototype
 lib/
   utils.ts              cn() helper
   storage.ts            Typed localStorage persistence
-  scoring.ts            Deterministic profile scoring + narratives
+  scoring.ts            Deterministic profile scoring + gap detection + narratives
   source-meta.tsx       Source-type labels/icons
-  ai/                   AI provider boundary (mock by default)
+  ai/                   AI provider boundary + centralized service (mock by default)
 types/                  Foundational domain models
 public/                 Static assets
 docs/                   Architecture and product documentation
@@ -70,9 +71,13 @@ docs/                   Architecture and product documentation
 - **Client store:** `EcholensProvider` exposes profiles, explored dimensions, and opened sources
   through a small context backed by `useSyncExternalStore` — hydrated from localStorage without
   effects and without a global state library.
-- **Scoring:** `lib/scoring.ts` deterministically derives awareness profiles from `UserResponse`s
-  (metrics, explored/unexplored dimensions, preferences, neutral narratives). Exploring a
-  dimension on the perspective map or opening a source updates the stored profile.
+- **Scoring & gaps:** `lib/scoring.ts` deterministically derives awareness profiles from
+  `UserResponse`s (metrics, explored/unexplored dimensions, preferences, neutral narratives) and
+  exposes `detectGaps(topic, explored)` for explicit gap comparison. Exploring a dimension on the
+  perspective map or opening a source updates the stored profile.
+- **Persisted user state:** profiles and scores, answers per topic, last-selected topic, explored
+  dimensions, opened graph nodes, opened sources, and viewed recommendations all persist in
+  `localStorage` (see `components/echolens-provider.tsx`).
 
 ## Data flow
 

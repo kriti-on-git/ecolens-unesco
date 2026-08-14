@@ -274,6 +274,44 @@ const housingDimensions: TopicDimension[] = [
   },
 ];
 
+const authorshipDimensions: TopicDimension[] = [
+  {
+    id: 'authorship-cultural',
+    kind: 'cultural',
+    label: 'Cultural dimension',
+    tag: 'Culture',
+    description: 'How authorship, creativity, and originality are being redefined.',
+  },
+  {
+    id: 'authorship-legal',
+    kind: 'legal',
+    label: 'Legal perspective',
+    tag: 'Law',
+    description: 'Copyright law and who owns AI-assisted works.',
+  },
+  {
+    id: 'authorship-economic',
+    kind: 'economic',
+    label: 'Economic dimension',
+    tag: 'Economy',
+    description: 'Publishing economics, advances, and who gets paid.',
+  },
+  {
+    id: 'authorship-ethical',
+    kind: 'ethical',
+    label: 'Ethical dimension',
+    tag: 'Ethics',
+    description: 'Credit, consent, and the ethics of imitation.',
+  },
+  {
+    id: 'authorship-individual',
+    kind: 'individual',
+    label: 'Individual perspective',
+    tag: 'Writers',
+    description: 'What the shift means for working writers and readers.',
+  },
+];
+
 const geneDimensions: TopicDimension[] = [
   {
     id: 'gene-scientific',
@@ -424,6 +462,23 @@ export const topics: Topic[] = [
     dimensions: workDimensions,
     createdAt: '2026-08-07T08:00:00Z',
     updatedAt: '2026-08-12T13:00:00Z',
+  },
+  {
+    id: 'topic-authorship',
+    slug: 'ai-generated-books-and-authorship',
+    title: 'AI-Generated Books and the Meaning of Authorship',
+    subtitle: 'Who owns a story when the machine writes it?',
+    summary:
+      'Publishers are releasing AI-assisted books, and writers, readers, and lawyers are arguing about what that does to the idea of authorship.',
+    whyItMatters:
+      'How copyright and culture settle this question will decide who gets credit, who gets paid, and what counts as a writer in the years ahead.',
+    categoryId: 'literature',
+    timeGroup: 'emerging',
+    trendSignal: 0.58,
+    discussionCount: 940,
+    dimensions: authorshipDimensions,
+    createdAt: '2026-08-08T08:00:00Z',
+    updatedAt: '2026-08-12T11:00:00Z',
   },
   {
     id: 'topic-gene-editing',

@@ -1,3 +1,4 @@
+import { ContinueExploring } from '@/components/continue-exploring';
 import { TopicExplorer } from '@/components/topic-explorer';
 import { topicCategories, topics } from '@/data';
 
@@ -15,6 +16,8 @@ export default function HomePage() {
           show you what you may be missing.
         </p>
       </section>
+
+      <ContinueExploring />
 
       <TopicExplorer topics={topics} categories={topicCategories} />
     </div>

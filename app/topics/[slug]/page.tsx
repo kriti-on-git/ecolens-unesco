@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { TrackLastTopic } from '@/components/track-last-topic';
 import { getCategoryLabel, getTopic, getDimension } from '@/data';
 import type { Metadata } from 'next';
 
@@ -28,6 +29,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
 
   return (
     <div className="mx-auto w-full max-w-4xl flex-1 px-4 py-12 sm:px-6">
+      <TrackLastTopic topicId={topic.id} />
       <Link
         href="/"
         className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-sm transition-colors"

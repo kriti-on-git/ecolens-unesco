@@ -31,27 +31,40 @@ interface InfoNodeData {
   kind: 'topic' | 'dimension' | 'claim' | 'evidence' | 'source';
   summary?: string;
   selected?: boolean;
+  opened?: boolean;
   dimensionKind?: TopicDimensionKind;
   sourceId?: string;
 }
 
 function InfoNode({ data }: NodeProps) {
-  const { label, tag, kind, selected } = data as unknown as InfoNodeData;
+  const { label, tag, kind, selected, opened } = data as unknown as InfoNodeData;
   const clickable = kind !== 'topic';
   return (
     <div
       className={cn(
         'bg-card max-w-52 min-w-36 rounded-lg border px-3 py-2 shadow-sm',
         selected && 'border-primary ring-primary/40 ring-1',
+        opened && 'border-dashed',
         clickable && 'hover:border-primary/60 cursor-pointer transition-colors',
         kind === 'topic' && 'border-primary/50 bg-primary/5',
       )}
     >
-      {tag && kind !== 'topic' && (
-        <p className="text-muted-foreground text-[9px] font-semibold tracking-[0.14em] uppercase">
-          {tag}
-        </p>
-      )}
+      <div className="flex items-center justify-between gap-2">
+        {tag && kind !== 'topic' ? (
+          <p className="text-muted-foreground text-[9px] font-semibold tracking-[0.14em] uppercase">
+            {tag}
+          </p>
+        ) : (
+          <span />
+        )}
+        {opened && (
+          <span
+            className="bg-primary size-1.5 shrink-0 rounded-full"
+            title="Opened"
+            aria-label="Opened"
+          />
+        )}
+      </div>
       <p className="text-[13px] leading-snug font-medium">{label}</p>
       <Handle
         type="target"
@@ -86,6 +99,8 @@ interface BranchData {
   claims: BranchNode[];
   evidence: BranchNode[];
   sources: Source[];
+  stakeholders: BranchNode[];
+  relatedIssues: BranchNode[];
 }
 
 export function PerspectiveMap({ topic }: { topic: Topic }) {
@@ -98,7 +113,7 @@ export function PerspectiveMap({ topic }: { topic: Topic }) {
 
 function PerspectiveMapInner({ topic }: { topic: Topic }) {
   const graph = useMemo(() => getKnowledgeGraph(topic.id), [topic.id]);
-  const { markDimensionsExplored } = useEcholens();
+  const { markDimensionsExplored, openedNodes, markNodeOpened } = useEcholens();
 
   const [selectedKind, setSelectedKind] = useState<TopicDimensionKind | null>(null);
   const [activeSource, setActiveSource] = useState<Source | null>(null);
@@ -107,8 +122,8 @@ function PerspectiveMapInner({ topic }: { topic: Topic }) {
   const { fitView } = useReactFlow();
 
   const elements = useMemo(
-    () => buildElements(topic, graph, selectedKind),
-    [topic, graph, selectedKind],
+    () => buildElements(topic, graph, selectedKind, openedNodes),
+    [topic, graph, selectedKind, openedNodes],
   );
 
   useEffect(() => {
@@ -128,9 +143,11 @@ function PerspectiveMapInner({ topic }: { topic: Topic }) {
         setSelectedKind(data.dimensionKind);
         markDimensionsExplored(topic, [data.dimensionKind]);
       } else if (data.kind === 'source' && data.sourceId) {
+        markNodeOpened(node.id);
         const source = getSourcesByIds([data.sourceId])[0];
         if (source) setActiveSource(source);
       } else if (data.kind === 'claim' || data.kind === 'evidence') {
+        markNodeOpened(node.id);
         setExpandedNodes((prev) => {
           const next = new Set(prev);
           if (next.has(node.id)) next.delete(node.id);
@@ -139,7 +156,7 @@ function PerspectiveMapInner({ topic }: { topic: Topic }) {
         });
       }
     },
-    [markDimensionsExplored, topic],
+    [markDimensionsExplored, markNodeOpened, topic],
   );
 
   return (
@@ -278,6 +295,20 @@ function BranchPanel({
         onToggleNode={onToggleNode}
         emptyText="No evidence mapped for this dimension yet."
       />
+      <BranchSection
+        title="Stakeholders"
+        items={branch.stakeholders}
+        expandedNodes={expandedNodes}
+        onToggleNode={onToggleNode}
+        emptyText="No stakeholders mapped for this topic yet."
+      />
+      <BranchSection
+        title="Related issues"
+        items={branch.relatedIssues}
+        expandedNodes={expandedNodes}
+        onToggleNode={onToggleNode}
+        emptyText="No related issues mapped for this topic yet."
+      />
 
       <div className="mt-5">
         <p className="text-muted-foreground text-[10px] font-semibold tracking-[0.16em] uppercase">
@@ -403,6 +434,7 @@ function buildElements(
   topic: Topic,
   graph: ReturnType<typeof getKnowledgeGraph>,
   selectedKind: TopicDimensionKind | null,
+  openedNodes: string[],
 ): { nodes: Node[]; edges: Edge[] } {
   if (selectedKind) {
     const branch = buildBranch(topic, graph, selectedKind);
@@ -426,13 +458,25 @@ function buildElements(
       id: `claim-${c.id}`,
       type: 'info' as const,
       position: { x: (i - (branch.claims.length - 1) / 2) * 250, y: -20 },
-      data: { label: c.label, tag: 'Claim', kind: 'claim', summary: c.summary },
+      data: {
+        label: c.label,
+        tag: 'Claim',
+        kind: 'claim',
+        summary: c.summary,
+        opened: openedNodes.includes(`claim-${c.id}`),
+      },
     }));
     const evidenceNodes = branch.evidence.map((e, i) => ({
       id: `evidence-${e.id}`,
       type: 'info' as const,
       position: { x: (i - (branch.evidence.length - 1) / 2) * 250, y: 130 },
-      data: { label: e.label, tag: 'Evidence', kind: 'evidence', summary: e.summary },
+      data: {
+        label: e.label,
+        tag: 'Evidence',
+        kind: 'evidence',
+        summary: e.summary,
+        opened: openedNodes.includes(`evidence-${e.id}`),
+      },
     }));
     const sourceNodes = branch.sources.map((s, i) => ({
       id: `source-${s.id}`,
@@ -444,6 +488,7 @@ function buildElements(
         kind: 'source',
         sourceId: s.id,
         summary: s.description,
+        opened: openedNodes.includes(`source-${s.id}`),
       },
     }));
     nodes.push(...claimNodes, ...evidenceNodes, ...sourceNodes);
@@ -565,6 +610,15 @@ function buildBranch(
   const sourceSet = new Map<string, Source>();
   [...graphSources, ...fallbackSources].forEach((s) => sourceSet.set(s.id, s));
 
+  const stakeholders: BranchNode[] =
+    graph?.nodes
+      .filter((n) => n.type === 'stakeholder')
+      .map((n) => ({ id: n.id, label: n.label, summary: n.summary, sourceIds: [] })) ?? [];
+  const relatedIssues: BranchNode[] =
+    graph?.nodes
+      .filter((n) => n.type === 'related-issue')
+      .map((n) => ({ id: n.id, label: n.label, summary: n.summary, sourceIds: [] })) ?? [];
+
   return {
     kind,
     label: dim.label,
@@ -573,5 +627,7 @@ function buildBranch(
     claims: graphClaims,
     evidence: graphEvidence,
     sources: [...sourceSet.values()],
+    stakeholders,
+    relatedIssues,
   };
 }

@@ -22,7 +22,7 @@ const classificationLabel: Record<string, string> = {
 };
 
 export function RecommendationList() {
-  const { openedSources } = useEcholens();
+  const { openedSources, viewedRecommendations, markRecommendationViewed } = useEcholens();
   const [dimension, setDimension] = useState<'all' | TopicDimensionKind>('all');
   const [topicFilter, setTopicFilter] = useState<'all' | string>('all');
   const [activeSource, setActiveSource] = useState<Source | null>(null);
@@ -91,6 +91,7 @@ export function RecommendationList() {
           {filtered.map((recommendation) => {
             const topic = getTopicById(recommendation.topicId);
             const opened = openedSources.includes(recommendation.source.id);
+            const viewed = viewedRecommendations.includes(recommendation.id);
             return (
               <motion.li
                 key={recommendation.id}
@@ -114,6 +115,12 @@ export function RecommendationList() {
                           <span aria-hidden>·</span>
                           <span>{recommendation.source.publishedAt}</span>
                         </>
+                      )}
+                      {viewed && (
+                        <span className="text-muted-foreground inline-flex items-center gap-1">
+                          <Check className="size-3" aria-hidden />
+                          Viewed
+                        </span>
                       )}
                       {opened && (
                         <span className="text-primary inline-flex items-center gap-1">
@@ -152,7 +159,10 @@ export function RecommendationList() {
                   <div className="flex shrink-0 items-center gap-3">
                     <button
                       type="button"
-                      onClick={() => setActiveSource(recommendation.source)}
+                      onClick={() => {
+                        markRecommendationViewed(recommendation.id);
+                        setActiveSource(recommendation.source);
+                      }}
                       className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
                     >
                       Explore

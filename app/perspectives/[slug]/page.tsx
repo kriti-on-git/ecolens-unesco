@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { PerspectiveMap } from '@/components/perspectives/perspective-map';
+import { TrackLastTopic } from '@/components/track-last-topic';
 import { getTopic } from '@/data';
 import type { Metadata } from 'next';
 
@@ -25,6 +26,7 @@ export default async function PerspectivesPage({ params }: PerspectivesPageProps
 
   return (
     <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6">
+      <TrackLastTopic topicId={topic.id} />
       <Link
         href={`/topics/${topic.slug}`}
         className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-sm transition-colors"

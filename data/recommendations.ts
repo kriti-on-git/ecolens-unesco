@@ -1,3 +1,4 @@
+import { sources } from './sources';
 import type { Recommendation } from '@/types';
 
 /**
@@ -6,34 +7,22 @@ import type { Recommendation } from '@/types';
  * Every recommendation carries an explicit, human-readable reason so the
  * user always understands *why* it was surfaced — typically because it
  * covers an unexplored perspective or is the primary source behind a claim
- * they encountered. Hardcoded prototype data.
+ * they encountered. Sources come from the shared registry (data/sources.ts),
+ * so metadata lives in one place. Hardcoded prototype data.
  */
+
+function src(id: string) {
+  const source = sources.find((s) => s.id === id);
+  if (!source) throw new Error(`Missing source for recommendation: ${id}`);
+  return source;
+}
+
 export const recommendations: Recommendation[] = [
+  // ---- The Global Push to Regulate AI ----
   {
     id: 'rec-alignment-book',
     topicId: 'topic-ai-regulation',
-    source: {
-      id: 'src-alignment-book',
-      title: 'The Alignment Problem: Machine Learning and Human Values',
-      sourceName: 'Brian Christian (W. W. Norton)',
-      type: 'book',
-      url: 'https://example.com/books/alignment-problem',
-      publishedAt: '2021-01-01',
-      description:
-        'A widely cited book tracing why building AI systems that reliably do what we intend is hard — and why that matters for regulation.',
-      dimensionKinds: ['ethical', 'scientific'],
-      classification: 'interpretation',
-      nutritionLabel: {
-        source: 'Brian Christian / W. W. Norton (publisher)',
-        publishedAt: '2021-01-01',
-        evidenceAvailability: 'medium',
-        primarySourceAvailability: 'low',
-        contextAvailability: 'high',
-        emotionalFraming: 'neutral',
-        relatedPerspectives: ['Ethical dimension', 'Scientific dimension'],
-        sourceDiversity: 'medium',
-      },
-    },
+    source: src('src-alignment-book'),
     dimensionKind: 'ethical',
     reasonKind: 'missing-perspective',
     whyRecommended:
@@ -42,28 +31,7 @@ export const recommendations: Recommendation[] = [
   {
     id: 'rec-draft-statute',
     topicId: 'topic-ai-regulation',
-    source: {
-      id: 'src-draft-statute',
-      title: 'Draft Statute on the Governance of AI Systems — Explanatory Memorandum',
-      sourceName: 'National Parliament (official)',
-      type: 'government-document',
-      url: 'https://example.com/parliament/draft-ai-statute',
-      publishedAt: '2026-07-15',
-      description:
-        "The official text of the proposed law with the parliament's explanatory memorandum, including the definition of high-risk systems and enforcement machinery.",
-      dimensionKinds: ['legal', 'institutional'],
-      classification: 'verified-fact',
-      nutritionLabel: {
-        source: 'National Parliament (government)',
-        publishedAt: '2026-07-15',
-        evidenceAvailability: 'high',
-        primarySourceAvailability: 'high',
-        contextAvailability: 'high',
-        emotionalFraming: 'neutral',
-        relatedPerspectives: ['Legal perspective', 'Institutional perspective'],
-        sourceDiversity: 'medium',
-      },
-    },
+    source: src('src-draft-statute'),
     dimensionKind: 'legal',
     reasonKind: 'primary-source',
     whyRecommended:
@@ -72,28 +40,7 @@ export const recommendations: Recommendation[] = [
   {
     id: 'rec-reg-monitor',
     topicId: 'topic-ai-regulation',
-    source: {
-      id: 'src-reg-monitor',
-      title: 'State of AI Regulation Across 12 Jurisdictions',
-      sourceName: 'International AI Governance Monitor',
-      type: 'report',
-      url: 'https://example.com/monitor/ai-regulation-12-jurisdictions',
-      publishedAt: '2026-07-28',
-      description:
-        'A comparative report mapping how twelve governments are approaching AI rule-making, from comprehensive statutes to voluntary codes.',
-      dimensionKinds: ['international', 'legal'],
-      classification: 'verified-fact',
-      nutritionLabel: {
-        source: 'International AI Governance Monitor (research org)',
-        publishedAt: '2026-07-28',
-        evidenceAvailability: 'high',
-        primarySourceAvailability: 'high',
-        contextAvailability: 'medium',
-        emotionalFraming: 'neutral',
-        relatedPerspectives: ['International dimension', 'Legal perspective'],
-        sourceDiversity: 'high',
-      },
-    },
+    source: src('src-reg-monitor'),
     dimensionKind: 'international',
     reasonKind: 'missing-perspective',
     whyRecommended:
@@ -102,28 +49,7 @@ export const recommendations: Recommendation[] = [
   {
     id: 'rec-labor-research',
     topicId: 'topic-ai-regulation',
-    source: {
-      id: 'src-labor-research',
-      title: 'Automation and Labor Markets: Evidence from 15 OECD Countries',
-      sourceName: 'Center for Applied AI Research',
-      type: 'research',
-      url: 'https://example.com/caair/automation-labor-markets',
-      publishedAt: '2026-06-15',
-      description:
-        'A peer-reviewed study measuring realized automation effects on employment across fifteen economies — findings are more mixed than headline claims suggest.',
-      dimensionKinds: ['economic', 'scientific'],
-      classification: 'verified-fact',
-      nutritionLabel: {
-        source: 'Center for Applied AI Research (academic)',
-        publishedAt: '2026-06-15',
-        evidenceAvailability: 'high',
-        primarySourceAvailability: 'medium',
-        contextAvailability: 'medium',
-        emotionalFraming: 'neutral',
-        relatedPerspectives: ['Economic dimension', 'Scientific dimension'],
-        sourceDiversity: 'high',
-      },
-    },
+    source: src('src-labor-research'),
     dimensionKind: 'economic',
     reasonKind: 'contrasting-evidence',
     whyRecommended:
@@ -132,58 +58,16 @@ export const recommendations: Recommendation[] = [
   {
     id: 'rec-court-ruling',
     topicId: 'topic-ai-regulation',
-    source: {
-      id: 'src-court-ruling',
-      title: 'Ruling on Automated Decision-Making and Due Process',
-      sourceName: 'Federal Administrative Court',
-      type: 'court-judgment',
-      url: 'https://example.com/courts/automated-decisions-ruling',
-      publishedAt: '2026-03-19',
-      description:
-        'A court ruling requiring meaningful human review when automated systems decide benefits claims — a precedent cited in the current debate.',
-      dimensionKinds: ['legal', 'individual'],
-      classification: 'verified-fact',
-      nutritionLabel: {
-        source: 'Federal Administrative Court (judicial)',
-        publishedAt: '2026-03-19',
-        evidenceAvailability: 'high',
-        primarySourceAvailability: 'high',
-        contextAvailability: 'medium',
-        emotionalFraming: 'neutral',
-        relatedPerspectives: ['Legal perspective', 'Individual perspective'],
-        sourceDiversity: 'medium',
-      },
-    },
+    source: src('src-court-ruling'),
     dimensionKind: 'legal',
     reasonKind: 'deepen-topic',
     whyRecommended:
-      "Recommended because this court ruling deepens the legal dimension — a precedent directly cited in today's debate.",
+      "Recommended because this court ruling deepens the legal dimension — a precedent cited in today's debate.",
   },
   {
     id: 'rec-hearing-transcript',
     topicId: 'topic-ai-regulation',
-    source: {
-      id: 'src-hearing-transcript',
-      title: 'Transcript: Public Hearing on AI Governance, Day 3',
-      sourceName: 'Parliamentary Archives',
-      type: 'primary-source',
-      url: 'https://example.com/parliament/hearing-transcript-day3',
-      publishedAt: '2026-07-22',
-      description:
-        'Verbatim testimony from engineers, labor representatives, and legal scholars, including the exchanges on model transparency and enforcement.',
-      dimensionKinds: ['institutional', 'social'],
-      classification: 'verified-fact',
-      nutritionLabel: {
-        source: 'Parliamentary Archives (primary record)',
-        publishedAt: '2026-07-22',
-        evidenceAvailability: 'high',
-        primarySourceAvailability: 'high',
-        contextAvailability: 'high',
-        emotionalFraming: 'neutral',
-        relatedPerspectives: ['Institutional perspective', 'Social dimension'],
-        sourceDiversity: 'high',
-      },
-    },
+    source: src('src-hearing-transcript'),
     dimensionKind: 'institutional',
     reasonKind: 'primary-source',
     whyRecommended:
@@ -192,32 +76,132 @@ export const recommendations: Recommendation[] = [
   {
     id: 'rec-expert-opinion',
     topicId: 'topic-ai-regulation',
-    source: {
-      id: 'src-expert-opinion',
-      title: 'Why I Testify Against the Cap on Open Models',
-      sourceName: 'Prof. Ada Lindqvist (commentary)',
-      type: 'expert-commentary',
-      url: 'https://example.com/commentary/against-open-model-cap',
-      publishedAt: '2026-08-01',
-      description:
-        "A prominent researcher's argument that restricting openly released models would slow safety research — labeled as opinion, with cited sources.",
-      dimensionKinds: ['scientific', 'ethical'],
-      classification: 'opinion',
-      nutritionLabel: {
-        source: 'Prof. Ada Lindqvist (individual expert)',
-        publishedAt: '2026-08-01',
-        evidenceAvailability: 'medium',
-        primarySourceAvailability: 'low',
-        contextAvailability: 'medium',
-        emotionalFraming: 'mild',
-        relatedPerspectives: ['Scientific dimension', 'Ethical dimension'],
-        sourceDiversity: 'medium',
-      },
-    },
+    source: src('src-expert-opinion'),
     dimensionKind: 'scientific',
     reasonKind: 'contrasting-evidence',
     whyRecommended:
       'Recommended because it is a clearly-labeled expert opinion that argues against the position most coverage assumes — worth reading as a contrast.',
+  },
+
+  // ---- Misinformation in the Coming Elections ----
+  {
+    id: 'rec-misinfo-factcheck',
+    topicId: 'topic-misinformation',
+    source: src('src-factcheck-roundup'),
+    dimensionKind: 'political',
+    reasonKind: 'primary-source',
+    whyRecommended:
+      'Recommended because this is the verified roundup behind the clip claims you encountered — what is real, what is missing, and what the original shows.',
+  },
+  {
+    id: 'rec-misinfo-amplifiers',
+    topicId: 'topic-misinformation',
+    source: src('src-amplifier-study'),
+    dimensionKind: 'scientific',
+    reasonKind: 'contrasting-evidence',
+    whyRecommended:
+      "Recommended because this network analysis shows a small set of accounts drives most reach — evidence that complicates the 'everyone shares it' story.",
+  },
+  {
+    id: 'rec-misinfo-survey',
+    topicId: 'topic-misinformation',
+    source: src('src-share-survey'),
+    dimensionKind: 'individual',
+    reasonKind: 'missing-perspective',
+    whyRecommended:
+      'Recommended because it covers the individual perspective — why people actually share — a dimension your exploration has not touched yet.',
+  },
+  {
+    id: 'rec-misinfo-transparency',
+    topicId: 'topic-misinformation',
+    source: src('src-platform-transparency'),
+    dimensionKind: 'institutional',
+    reasonKind: 'primary-source',
+    whyRecommended:
+      'Recommended because it is the primary record of platform enforcement — official disclosures rather than commentary about them.',
+  },
+  {
+    id: 'rec-misinfo-law',
+    topicId: 'topic-misinformation',
+    source: src('src-election-law-comparison'),
+    dimensionKind: 'legal',
+    reasonKind: 'missing-perspective',
+    whyRecommended:
+      'Recommended because it covers the legal dimension — how different states regulate deepfakes and coordination — which you have not explored.',
+  },
+  {
+    id: 'rec-misinfo-ruling',
+    topicId: 'topic-misinformation',
+    source: src('src-disinfo-ruling'),
+    dimensionKind: 'legal',
+    reasonKind: 'deepen-topic',
+    whyRecommended:
+      'Recommended because this court ruling clarifies the disclosure standards behind the enforcement debate — a deeper look at the legal dimension.',
+  },
+  {
+    id: 'rec-misinfo-thread',
+    topicId: 'topic-misinformation',
+    source: src('src-clip-thread'),
+    dimensionKind: 'social',
+    reasonKind: 'contrasting-evidence',
+    whyRecommended:
+      'Recommended because this documented spread timeline lets you see the social mechanics firsthand — a ground-level contrast to platform reports.',
+  },
+
+  // ---- Urban Housing Affordability ----
+  {
+    id: 'rec-housing-permits',
+    topicId: 'topic-housing',
+    source: src('src-housing-permits'),
+    dimensionKind: 'economic',
+    reasonKind: 'deepen-topic',
+    whyRecommended:
+      'Recommended because this is the data behind the supply claim — a decade of permits and rents to check the argument against.',
+  },
+  {
+    id: 'rec-housing-displacement',
+    topicId: 'topic-housing',
+    source: src('src-displacement-study'),
+    dimensionKind: 'social',
+    reasonKind: 'contrasting-evidence',
+    whyRecommended:
+      "Recommended because this longitudinal study complicates the 'build more and everything works' story with evidence about who actually moves.",
+  },
+  {
+    id: 'rec-housing-zoning',
+    topicId: 'topic-housing',
+    source: src('src-zoning-code'),
+    dimensionKind: 'legal',
+    reasonKind: 'primary-source',
+    whyRecommended:
+      'Recommended because this is the primary source at the center of the debate — the actual rules governing density and use.',
+  },
+  {
+    id: 'rec-housing-minutes',
+    topicId: 'topic-housing',
+    source: src('src-council-minutes'),
+    dimensionKind: 'political',
+    reasonKind: 'primary-source',
+    whyRecommended:
+      'Recommended because this verbatim hearing record lets you hear tenants, landlords, and developers in their own words.',
+  },
+  {
+    id: 'rec-housing-evicted',
+    topicId: 'topic-housing',
+    source: src('src-evicted-book'),
+    dimensionKind: 'social',
+    reasonKind: 'missing-perspective',
+    whyRecommended:
+      'Recommended because it brings the social dimension to life — ground-level reporting on instability you have not encountered in this exploration.',
+  },
+  {
+    id: 'rec-housing-ruling',
+    topicId: 'topic-housing',
+    source: src('src-rent-ruling'),
+    dimensionKind: 'legal',
+    reasonKind: 'deepen-topic',
+    whyRecommended:
+      'Recommended because this court ruling is the precedent shaping what the plan can legally do — a deeper look at the legal dimension.',
   },
 ];
 

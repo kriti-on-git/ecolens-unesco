@@ -10,11 +10,22 @@ interface EcholensState {
   profiles: Record<string, AwarenessProfile>;
   explored: Record<string, TopicDimensionKind[]>;
   openedSources: string[];
+  /** Answers recorded per topic, so a journey can be reconstructed. */
+  responses: Record<string, UserResponse[]>;
+  /** The most recently selected topic (used for “continue exploring”). */
+  lastTopicId: string | null;
+  /** Recommendation cards the user has viewed. */
+  viewedRecommendations: string[];
+  /** Knowledge-graph nodes the user has opened. */
+  openedNodes: string[];
 }
 
 interface EcholensContextValue {
   hydrated: boolean;
   openedSources: string[];
+  viewedRecommendations: string[];
+  openedNodes: string[];
+  lastTopicId: string | null;
   getProfile: (topicId: string) => AwarenessProfile | null;
   getProfiles: () => AwarenessProfile[];
   completeCaseStudy: (
@@ -25,11 +36,22 @@ interface EcholensContextValue {
   ) => AwarenessProfile;
   markDimensionsExplored: (topic: Topic, kinds: TopicDimensionKind[]) => void;
   markSourceOpened: (topicId: string | null, sourceId: string, sourceTitle: string) => void;
+  setLastTopic: (topicId: string) => void;
+  markRecommendationViewed: (recommendationId: string) => void;
+  markNodeOpened: (nodeId: string) => void;
 }
 
 const EcholensContext = createContext<EcholensContextValue | null>(null);
 
-const EMPTY_STATE: EcholensState = { profiles: {}, explored: {}, openedSources: [] };
+const EMPTY_STATE: EcholensState = {
+  profiles: {},
+  explored: {},
+  openedSources: [],
+  responses: {},
+  lastTopicId: null,
+  viewedRecommendations: [],
+  openedNodes: [],
+};
 
 /**
  * Module-level store read via useSyncExternalStore. This lets the provider
@@ -95,7 +117,12 @@ export function EcholensProvider({ children }: { children: React.ReactNode }) {
         prior,
         previouslyExplored,
       });
-      update((s) => ({ ...s, profiles: { ...s.profiles, [topic.id]: profile } }));
+      update((s) => ({
+        ...s,
+        profiles: { ...s.profiles, [topic.id]: profile },
+        responses: { ...s.responses, [topic.id]: responses },
+        lastTopicId: topic.id,
+      }));
       return profile;
     };
 
@@ -130,14 +157,38 @@ export function EcholensProvider({ children }: { children: React.ReactNode }) {
       });
     };
 
+    const setLastTopic: EcholensContextValue['setLastTopic'] = (topicId) => {
+      update((s) => (s.lastTopicId === topicId ? s : { ...s, lastTopicId: topicId }));
+    };
+
+    const markRecommendationViewed: EcholensContextValue['markRecommendationViewed'] = (id) => {
+      update((s) =>
+        s.viewedRecommendations.includes(id)
+          ? s
+          : { ...s, viewedRecommendations: [...s.viewedRecommendations, id] },
+      );
+    };
+
+    const markNodeOpened: EcholensContextValue['markNodeOpened'] = (nodeId) => {
+      update((s) =>
+        s.openedNodes.includes(nodeId) ? s : { ...s, openedNodes: [...s.openedNodes, nodeId] },
+      );
+    };
+
     return {
       hydrated,
       openedSources: state.openedSources,
+      viewedRecommendations: state.viewedRecommendations,
+      openedNodes: state.openedNodes,
+      lastTopicId: state.lastTopicId,
       getProfile,
       getProfiles,
       completeCaseStudy,
       markDimensionsExplored,
       markSourceOpened,
+      setLastTopic,
+      markRecommendationViewed,
+      markNodeOpened,
     };
   }, [state, hydrated]);
 

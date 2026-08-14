@@ -17,7 +17,8 @@ export type CaseQuestionType =
   | 'consequence'
   | 'stakeholder'
   | 'uncertainty'
-  | 'source-selection';
+  | 'source-selection'
+  | 'context';
 
 export interface CaseOption {
   id: string;

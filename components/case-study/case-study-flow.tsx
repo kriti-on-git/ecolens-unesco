@@ -32,6 +32,7 @@ const TYPE_HINTS: Record<CaseQuestionType, string> = {
   stakeholder: 'You thought about whose perspective should carry weight.',
   uncertainty: 'You engaged with what remains unknown.',
   'source-selection': 'You considered where information comes from.',
+  context: 'You reached for context — what surrounds and shapes the facts.',
 };
 
 interface CaseStudyFlowProps {

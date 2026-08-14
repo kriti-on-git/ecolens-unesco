@@ -26,23 +26,45 @@
 - Scoring and awareness-profile derivation
 - Topic dimensions and perspective registry
 - Prototype recommendations and their reasons
-- Knowledge-graph relationships
-
-## The provider boundary (`lib/ai`)
+- Knowledge-graph relationships## The provider boundary (`lib/ai`)
 
 ```
 lib/ai/
-  types.ts   AiProvider interface, AiRequest, AiResponse
+  types.ts   AiProvider interface, AiRequest/AiResponse, structured result types
   config.ts  Provider name, API key, model (from env; mock by default)
   mock.ts    Deterministic mock provider (never fails)
-  index.ts   getAiProvider() / generateText() — the only public entry points
+  service.ts Centralized service: structured analysis functions + deterministic fallbacks
+  index.ts   getAiProvider() / generateText() + re-exports the service
 ```
 
-- `AiRequest` carries an optional `context` (e.g. `intent: "summarize" | "explain" |
-"recommend"`, topic id, explored dimensions) so providers can shape responses.
+- `AiRequest` carries an optional `context` (e.g. `intent`, topic id, dimension) so providers can
+  shape responses.
 - `AiResponse` always reports `provider`, `model`, and `isMock` so the UI can show provenance.
 - Configuration is read from `LLM_PROVIDER`, `LLM_API_KEY`, `LLM_MODEL` (see `.env.example`).
   With no configuration, `mock` is used and no external call is made.
+
+## The centralized service
+
+All structured analysis goes through `lib/ai/service.ts`. Each function calls the provider and,
+if AI is unavailable or fails, falls back to a deterministic implementation built from typed
+local data — the application never shows a broken state.
+
+| Function                      | Structured output                                                                     | Deterministic fallback                   |
+| ----------------------------- | ------------------------------------------------------------------------------------- | ---------------------------------------- |
+| `analyzeContent(input)`       | Content understanding: summary, claims, classification, dimensions covered, nutrition | Sentence extraction + keyword heuristics |
+| `interpretTopic(topic)`       | Topic summary, key claims, tensions, dimensions                                       | Built from topic + knowledge-graph data  |
+| `extractClaims(text)`         | Claims with evidentiary status + hints                                                | Sentence extraction + status heuristics  |
+| `explainContext(topic, kind)` | Why a dimension matters                                                               | Built from topic + dimension registry    |
+| `explainRecommendation(rec)`  | Recommendation reason                                                                 | Returns the curated `whyRecommended`     |
+
+The provider remains replaceable behind the `AiProvider` interface; provider-specific code never
+appears in the frontend. A real provider's JSON output is parsed when available and falls back
+to the deterministic result on any error.
+
+### Surface: `POST /api/analyze`
+
+The content-understanding endpoint (`app/api/analyze/route.ts`) accepts `{ text }` and returns
+a structured `ContentAnalysisResult` — always functional, even with no LLM configured.
 
 ## Reliability rules
 

@@ -25,7 +25,7 @@ import type {
 const EVIDENCE_TYPES = new Set(['evidence', 'uncertainty', 'source-selection']);
 
 /** Question types that exercise context and framing. */
-const CONTEXT_TYPES = new Set(['interpretation', 'consequence']);
+const CONTEXT_TYPES = new Set(['interpretation', 'consequence', 'context']);
 
 export interface ScoreInput {
   topic: Topic;
@@ -42,12 +42,15 @@ export function scoreCaseStudy(input: ScoreInput): AwarenessProfile {
   const { topic, responses, pathLength, attempt, prior, previouslyExplored } = input;
 
   const topicKinds = topic.dimensions.map((d) => d.kind);
-  const explored = union(
+  const encountered = union(
     previouslyExplored ?? [],
     ...responses.map((r) => r.dimensionKinds),
     prior?.exploredDimensions ?? [],
   );
-  const unexplored = topicKinds.filter((kind) => !explored.includes(kind));
+  // The profile describes coverage for the selected topic, so exploration is
+  // scoped to the topic's own dimensions (options may lean on other kinds).
+  const { explored, missing } = detectGaps(topic, encountered);
+  const unexplored = missing;
 
   const answered = responses.length;
   const evidenceRatio = answered
@@ -215,6 +218,20 @@ export function markSourceOpenedInProfile(
   return { ...profile, updatedAt: new Date().toISOString(), metrics };
 }
 
+/**
+ * Gap detection — compare the topic's dimensions against the dimensions the
+ * user has explored. Returns what was covered and what is still missing.
+ */
+export function detectGaps(
+  topic: Topic,
+  encounteredKinds: TopicDimensionKind[],
+): { explored: TopicDimensionKind[]; missing: TopicDimensionKind[] } {
+  const topicKinds = topic.dimensions.map((d) => d.kind);
+  const explored = topicKinds.filter((kind) => encounteredKinds.includes(kind));
+  const missing = topicKinds.filter((kind) => !encounteredKinds.includes(kind));
+  return { explored, missing };
+}
+
 /** Longest path length from the entry question (for progress + depth scaling). */
 export function estimatePathLength(
   questions: Record<string, CaseQuestion>,
@@ -241,26 +258,26 @@ function derivePreferences(responses: UserResponse[]): {
   evidencePreference: EvidencePreference;
   sourcePreference: SourcePreference;
 } {
+  // Derived from the reasoning path labels, so it works across case studies
+  // rather than depending on a specific question's option ids.
   let evidencePreference: EvidencePreference = 'balanced';
   let sourcePreference: SourcePreference = 'mixed';
 
   for (const response of responses) {
-    const optionId = response.optionId;
-    if (optionId === 'q7-o1') {
+    const label = response.pathLabel?.toLowerCase() ?? '';
+    if (/worker|interview|primary/.test(label)) {
       evidencePreference = 'primary';
       sourcePreference = 'social';
-    } else if (optionId === 'q7-o2') {
+    } else if (/union|reporter|coverage|press/.test(label)) {
       evidencePreference = 'expert';
       sourcePreference = 'news';
-    } else if (optionId === 'q7-o3') {
+    } else if (/history|historical|past|study|research|methodology|data/.test(label)) {
       evidencePreference = 'expert';
       sourcePreference = 'academic';
-    } else if (optionId === 'q2-o1') {
-      evidencePreference = 'expert';
-    } else if (optionId === 'q2-o2') {
-      evidencePreference = 'balanced';
-    } else if (optionId.startsWith('fq-legal-1')) {
+    } else if (/court|statute|law|legal|regulator|ruling/.test(label)) {
       sourcePreference = 'government';
+    } else if (/watchdog|official|platform|transparency/.test(label)) {
+      sourcePreference = 'mixed';
     }
   }
 

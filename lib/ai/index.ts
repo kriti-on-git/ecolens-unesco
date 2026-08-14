@@ -3,6 +3,7 @@ import { MockAiProvider } from './mock';
 import type { AiProvider, AiRequest, AiResponse } from './types';
 
 export * from './config';
+export * from './service';
 export * from './types';
 
 let provider: AiProvider | undefined;

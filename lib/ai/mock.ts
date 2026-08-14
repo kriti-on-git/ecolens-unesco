@@ -8,6 +8,12 @@ import type { AiProvider, AiRequest, AiResponse } from './types';
  * unknown falls back to a summary. It never fails.
  */
 const fallbacks: Record<string, string> = {
+  analyze:
+    'This content centers on contested claims. Some are supported by cited evidence, others are asserted without support. The framing shapes the conclusion — check the primary sources and note what is opinion before forming a view.',
+  interpret:
+    'This topic is contested across several perspectives. The claims made on each side rest on different evidence and different assumptions. The full picture requires exploring the dimensions you have not yet covered.',
+  'extract-claims':
+    'The claims in this content can be separated from their framing. Each should be verified against the underlying sources before being treated as established.',
   summarize:
     'This content centers on a contested policy question. Several claims are made, but the evidence cited is partial and the framing shapes the conclusion. Consider checking the primary sources and contrasting perspectives before forming a view.',
   explain:
