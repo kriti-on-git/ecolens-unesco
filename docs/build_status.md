@@ -79,19 +79,26 @@ for the team — anyone should be able to read it and know exactly where the pro
   branch). The fallback is now scoped to the topic's own sources.
 - **Visual QA in headless Chrome:** 44 page/viewport combinations (22 pages × desktop +
   mobile) render with zero console errors and zero horizontal overflow.
+- **Bugfix: sources disconnected from the perspective-map branch.** The branch view's
+  edge mapping registered source _ids_ while graph edges reference graph _node_ ids, so
+  every `evidence → source` link was silently dropped and sources floated unconnected.
+  The mapping now resolves graph source nodes to their rendered flow nodes, and every
+  evidence node is additionally linked to the sources behind it (deduplicated against the
+  graph edges). Verified: branches now render the full `dimension → claim → evidence →
+source` chain in the browser.
 
 ## Verification status
 
-| Gate                                    | Status                                                      |
-| --------------------------------------- | ----------------------------------------------------------- |
-| `npm run lint`                          | ✅ passing                                                  |
-| `npm run build`                         | ✅ passing                                                  |
-| `npm run format:check`                  | ✅ passing                                                  |
-| Route sweep (all pages)                 | ✅ all 200 incl. all 9 case studies (unknown slug → 404)    |
-| AI endpoint (`/api/analyze`)            | ✅ structured output, 400 on empty input                    |
-| End-to-end journey (headless Chrome)    | ✅ 10/10 checks                                             |
-| New-topic content journey               | ✅ 7/7 checks (energy case study → profile → branch → recs) |
-| Visual QA (22 pages × desktop + mobile) | ✅ 44/44 clean (no console errors, no overflow)             |
+| Gate                                 | Status                                                      |
+| ------------------------------------ | ----------------------------------------------------------- |
+| `npm run lint`                       | ✅ passing                                                  |
+| `npm run build`                      | ✅ passing                                                  |
+| `npm run format:check`               | ✅ passing                                                  |
+| Route sweep (all pages)              | ✅ all 200 incl. all 9 case studies (unknown slug → 404)    |
+| AI endpoint (`/api/analyze`)         | ✅ structured output, 400 on empty input                    |
+| End-to-end journey (headless Chrome) | ✅ 10/10 checks                                             |
+| New-topic content journey            | ✅ 7/7 checks (energy case study → profile → branch → recs) |     | Visual QA (22 pages × desktop + mobile) | ✅ 44/44 clean (no console errors, no overflow) |
+| Perspective-map edge rendering       | ✅ evidence → source edges render in every branch           |
 
 The end-to-end journey drives the real product with real input events: completes the case
 study first pass, verifies profile persistence, opens a dimension branch on the perspective

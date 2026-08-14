@@ -502,17 +502,34 @@ function buildElements(
     nodes.push(...claimNodes, ...evidenceNodes, ...sourceNodes);
 
     // Use the typed graph relationships when available (dim → claim → evidence → source).
+    // Graph edge endpoints are graph NODE ids; map them onto the flow node ids.
     const flowIdByGraphId = new Map<string, string>();
     if (graph) {
       const dimNode = graph.nodes.find(
         (n) => n.type === 'dimension' && n.dimensionKind === branch.kind,
       );
       if (dimNode) flowIdByGraphId.set(dimNode.id, `dim-${branch.kind}`);
+      // Source nodes carry sourceIds referencing the shared source registry
+      // (e.g. n-src-statute → src-draft-statute). Without this mapping the
+      // evidence → source edges are silently dropped, leaving sources
+      // disconnected from the branch (visual QA fix).
+      graph.nodes
+        .filter(
+          (n) =>
+            !['topic', 'dimension', 'claim', 'evidence', 'stakeholder', 'related-issue'].includes(
+              n.type,
+            ),
+        )
+        .forEach((n) => {
+          const sourceId = n.sourceIds?.[0];
+          if (sourceId) flowIdByGraphId.set(n.id, `source-${sourceId}`);
+        });
     }
     branch.claims.forEach((c) => flowIdByGraphId.set(c.id, `claim-${c.id}`));
     branch.evidence.forEach((e) => flowIdByGraphId.set(e.id, `evidence-${e.id}`));
     branch.sources.forEach((s) => flowIdByGraphId.set(s.id, `source-${s.id}`));
 
+    const coveredPairs = new Set<string>();
     graph?.edges.forEach((ge) => {
       const source = flowIdByGraphId.get(ge.sourceId);
       const target = flowIdByGraphId.get(ge.targetId);
@@ -524,7 +541,28 @@ function buildElements(
           style: EDGE_STYLE,
           animated: false,
         });
+        coveredPairs.add(`${source}->${target}`);
       }
+    });
+
+    // Always link each evidence node to the sources behind it. Evidence
+    // carries its own sourceIds, so this also covers sources that have no
+    // explicit graph edge (e.g. recommendation-only fallbacks) while
+    // skipping pairs the graph already connected.
+    const sourceIdsInBranch = new Set(branch.sources.map((s) => s.id));
+    branch.evidence.forEach((e) => {
+      e.sourceIds.forEach((sourceId) => {
+        if (!sourceIdsInBranch.has(sourceId)) return;
+        const pair = `evidence-${e.id}->source-${sourceId}`;
+        if (coveredPairs.has(pair)) return;
+        coveredPairs.add(pair);
+        edges.push({
+          id: `edge-es-${pair}`,
+          source: `evidence-${e.id}`,
+          target: `source-${sourceId}`,
+          style: EDGE_STYLE,
+        });
+      });
     });
 
     // Fallback links for graphs without explicit edges (e.g. dimension → claims).

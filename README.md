@@ -10,27 +10,24 @@ It is **not** a tool that tells users what to believe, grades their opinions, or
 biased. It makes the information ecosystem visible and encourages critical thinking through
 interaction.
 
-This repository contains the **prototype foundation** for Echolens: a Next.js application with a
-typed data model, mock content, initial routing, and full documentation. The complete product
-experience (adaptive case studies, awareness profiles, knowledge graphs, recommendations) is
-built on top of this foundation.
+This repository contains the Echolens application: a Next.js product with a typed data model,
+curated content, adaptive learning experiences, and an AI layer behind a single provider
+boundary.
 
-## Prototype scope
+## The experience
 
-This is a ~20-hour prototype, not a production system. It demonstrates the complete Echolens
-experience through a reliable vertical slice:
-
-- Curated topic discovery organized by time and category (hardcoded prototype signals)
-- Adaptive, branching case studies (hardcoded trees — no right/wrong answers)
-- Awareness profiles that describe _information coverage_, not identity
-- Perspective maps and dynamic information branches
-- Knowledge graph visualizations (typed local data rendered with React Flow)
-- Recommendations that always explain _why_ they were recommended
-- Deterministic mock AI behind a single configurable provider boundary
-
-Hardcoded prototype data (topics, case studies, sources, graphs, recommendations) lives in
-[`data/`](./data) and is designed to be replaced by real APIs and databases later **without
-rewriting the UI**.
+- **Topic discovery** — a living landscape of issues organized by time and category, with
+  search and trending signals
+- **Adaptive case studies** — branching, scenario-based explorations with no right or wrong
+  answers; each choice reveals how you approach an issue and routes you down a different path,
+  with second-pass questions about the ground you skipped
+- **Awareness profiles** — a dashboard that describes your _information coverage_ (perspectives
+  explored, evidence engaged, gaps remaining) — never a diagnosis of who you are
+- **Perspective maps** — interactive knowledge graphs that connect a topic's dimensions,
+  claims, evidence, and sources, so you can see where every claim leads and what backs it up
+- **Recommendations** — sources and content surfaced because they cover an unexplored
+  perspective or back a claim you met — always with an explicit reason, and always with an
+  **information nutrition label** so you can judge the source before you draw conclusions
 
 ## Tech stack
 
@@ -59,13 +56,15 @@ npm run dev
 # open http://localhost:3000
 ```
 
-No environment variables or external services are required — the prototype runs entirely on
-deterministic local data and the mock AI provider.
+No external services are required to run the application — it works fully offline with the
+built-in content and AI provider.
 
-### Optional: enable a real LLM
+### AI provider
 
-All AI calls are isolated behind [`lib/ai/`](./lib/ai). To switch from the deterministic mock to
-a real provider, copy `.env.example` to `.env.local` and set the variables there:
+All AI calls are isolated behind [`lib/ai/`](./lib/ai). The application ships with a
+deterministic provider that generates structured analysis from the typed content — reliable,
+instant, and fully offline. To use a real LLM instead, copy `.env.example` to `.env.local` and
+set the variables:
 
 ```bash
 LLM_PROVIDER=openai        # or "anthropic"
@@ -73,8 +72,8 @@ LLM_API_KEY=your_key_here
 LLM_MODEL=your_model
 ```
 
-The application never depends on the LLM: if it fails or is unconfigured, deterministic fallback
-content keeps the experience intact.
+The application never depends on the LLM: if it fails or is unconfigured, the built-in provider
+keeps the experience intact.
 
 ## Commands
 
@@ -92,9 +91,9 @@ content keeps the experience intact.
 ```
 app/            Next.js App Router pages (topic discovery, case study, profile, …)
 components/     React components (ui primitives + feature components)
-data/           Typed mock content (topics, case studies, sources, graphs, …)
+data/           Typed content (topics, case studies, sources, knowledge graphs, …)
 docs/           Architecture and product documentation
-lib/            Utilities and the AI provider boundary
+lib/            Utilities, scoring, storage, and the AI provider boundary
 public/         Static assets
 types/          Foundational domain models shared across the app
 ```
@@ -106,6 +105,7 @@ types/          Foundational domain models shared across the app
 - [`docs/data-model.md`](./docs/data-model.md) — typed data models and future migrations
 - [`docs/ai-strategy.md`](./docs/ai-strategy.md) — AI boundaries and fallback strategy
 - [`docs/future-architecture.md`](./docs/future-architecture.md) — production-scale vision
+- [`docs/build_status.md`](./docs/build_status.md) — what is built and verified, for the team
 - [`project_base.md`](./project_base.md) — project overview and philosophy
 
 ## Development philosophy
@@ -113,5 +113,5 @@ types/          Foundational domain models shared across the app
 - Build **vertically**: complete user journey → interaction → visual quality → AI → edge cases.
 - Preserve the architecture: reuse existing components and utilities, never replace a working
   implementation with a more complicated one.
-- No unnecessary infrastructure: no databases, auth, or external APIs in the prototype unless
-  genuinely required by the experience.
+- No unnecessary infrastructure: no databases, auth, or external APIs required to run the
+  product.
