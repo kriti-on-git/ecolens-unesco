@@ -40,10 +40,19 @@ app/                    Next.js App Router pages
 components/
   ui/                   shadcn/ui primitives (button, card, badge, …)
   site-header.tsx       Persistent navigation
-  topic-explorer.tsx    Discovery filters (time + category)
+  topic-explorer.tsx    Discovery filters + search
+  echolens-provider.tsx Client store (profiles, explored dimensions, opened sources)
+  case-study/           Adaptive branching question flow
+  profile/              Awareness profile dashboard (recharts radar)
+  perspectives/         React Flow perspective map + animated information branches
+  recommendations/      Recommendation cards with reasons
+  source-drawer.tsx     Content exploration drawer with nutrition label
 data/                   Typed mock content (replaces APIs/databases in prototype)
 lib/
   utils.ts              cn() helper
+  storage.ts            Typed localStorage persistence
+  scoring.ts            Deterministic profile scoring + narratives
+  source-meta.tsx       Source-type labels/icons
   ai/                   AI provider boundary (mock by default)
 types/                  Foundational domain models
 public/                 Static assets
@@ -57,8 +66,13 @@ docs/                   Architecture and product documentation
 - **Client components where interactivity lives:** filters, the case-study question flow, the
   profile charts, and graph interactions. Marked with `"use client"`.
 - **Persistence:** user progress (responses, explored dimensions, profiles, opened
-  recommendations) is stored in `localStorage` via a small typed storage layer. No global state
-  library — React state and context only where genuinely needed.
+  sources) is stored in `localStorage` via a typed storage layer (`lib/storage.ts`).
+- **Client store:** `EcholensProvider` exposes profiles, explored dimensions, and opened sources
+  through a small context backed by `useSyncExternalStore` — hydrated from localStorage without
+  effects and without a global state library.
+- **Scoring:** `lib/scoring.ts` deterministically derives awareness profiles from `UserResponse`s
+  (metrics, explored/unexplored dimensions, preferences, neutral narratives). Exploring a
+  dimension on the perspective map or opening a source updates the stored profile.
 
 ## Data flow
 

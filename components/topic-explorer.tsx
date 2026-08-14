@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowUpRight, MessageSquare } from 'lucide-react';
+import { ArrowUpRight, MessageSquare, Search, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { Topic, TopicCategory, TopicTimeGroup } from '@/types';
@@ -23,13 +23,22 @@ interface TopicExplorerProps {
 export function TopicExplorer({ topics, categories }: TopicExplorerProps) {
   const [timeGroup, setTimeGroup] = useState<'all' | TopicTimeGroup>('all');
   const [categoryId, setCategoryId] = useState<'all' | string>('all');
+  const [query, setQuery] = useState('');
 
   const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
     return topics
       .filter((topic) => timeGroup === 'all' || topic.timeGroup === timeGroup)
       .filter((topic) => categoryId === 'all' || topic.categoryId === categoryId)
+      .filter(
+        (topic) =>
+          !q ||
+          topic.title.toLowerCase().includes(q) ||
+          topic.subtitle.toLowerCase().includes(q) ||
+          topic.summary.toLowerCase().includes(q),
+      )
       .sort((a, b) => b.trendSignal - a.trendSignal);
-  }, [topics, timeGroup, categoryId]);
+  }, [topics, timeGroup, categoryId, query]);
 
   return (
     <section className="mt-10">
@@ -49,6 +58,31 @@ export function TopicExplorer({ topics, categories }: TopicExplorerProps) {
             />
           ))}
         </div>
+      </div>
+
+      <div className="relative mt-4 max-w-md">
+        <Search
+          className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
+          aria-hidden
+        />
+        <input
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Search topics…"
+          aria-label="Search topics"
+          className="border-border/70 bg-card focus:border-primary/60 focus:ring-primary/20 placeholder:text-muted-foreground h-10 w-full rounded-lg border pr-9 pl-9 text-sm transition-colors outline-none focus:ring-2"
+        />
+        {query && (
+          <button
+            type="button"
+            onClick={() => setQuery('')}
+            aria-label="Clear search"
+            className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2.5 -translate-y-1/2 rounded p-0.5 transition-colors"
+          >
+            <X className="size-4" aria-hidden />
+          </button>
+        )}
       </div>
 
       <div className="mt-4 flex flex-wrap gap-1.5">
@@ -130,6 +164,7 @@ export function TopicExplorer({ topics, categories }: TopicExplorerProps) {
             onClick={() => {
               setTimeGroup('all');
               setCategoryId('all');
+              setQuery('');
             }}
           >
             Clear filters

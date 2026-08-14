@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowLeft, Network } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { PerspectiveMap } from '@/components/perspectives/perspective-map';
 import { getTopic } from '@/data';
 import type { Metadata } from 'next';
 
@@ -24,7 +24,7 @@ export default async function PerspectivesPage({ params }: PerspectivesPageProps
   if (!topic) notFound();
 
   return (
-    <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-12 sm:px-6">
+    <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6">
       <Link
         href={`/topics/${topic.slug}`}
         className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-sm transition-colors"
@@ -40,30 +40,13 @@ export default async function PerspectivesPage({ params }: PerspectivesPageProps
         <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
           See what you may be missing
         </h1>
+        <p className="text-muted-foreground mt-3 max-w-2xl text-base leading-relaxed">
+          The issue at the center, the perspectives around it. Click an unexplored dimension to open
+          its information branch — and your profile updates as you explore.
+        </p>
       </div>
 
-      <Card className="mt-10">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Network className="text-primary size-4" aria-hidden />
-            The information map renders here
-          </CardTitle>
-          <CardDescription className="leading-relaxed">
-            This topic&apos;s knowledge graph — {topic.dimensions.length} dimensions of claims,
-            evidence, and sources — will be rendered here as an interactive React Flow map. Each
-            node opens a dynamic branch of deeper information.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ul className="grid gap-2 sm:grid-cols-2">
-            {topic.dimensions.map((dimension) => (
-              <li key={dimension.id} className="text-muted-foreground text-sm">
-                {dimension.label}
-              </li>
-            ))}
-          </ul>
-        </CardContent>
-      </Card>
+      <PerspectiveMap topic={topic} />
     </div>
   );
 }

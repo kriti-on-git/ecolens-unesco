@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowLeft, ArrowRight, Layers } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Eye, Layers } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -108,6 +108,13 @@ export default async function TopicPage({ params }: TopicPageProps) {
               >
                 Start case study
                 <ArrowRight className="ml-1.5 size-4" aria-hidden />
+              </Link>
+              <Link
+                href={`/perspectives/${topic.slug}`}
+                className={buttonVariants({ variant: 'outline', className: 'w-full' })}
+              >
+                <Eye className="mr-1.5 size-4" aria-hidden />
+                See the information map
               </Link>
               <Separator />
               <dl className="text-muted-foreground space-y-2 text-xs">
