@@ -1,0 +1,11 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Optional environment variable defaults for Netlify deployment
+[build.environment]
+  NODE_VERSION = "20"
+  LLM_PROVIDER = "mock"
